@@ -44,6 +44,14 @@ public class ResourcesMojo extends AbstractMojo {
      */
     protected String encoding;
 	
+    /**
+     * The source directory
+     * 
+     * @parameter default-value="src/main/rpm"
+     * @required
+     */
+    private File sources;
+    
 	/**
 	 * The output directory into which to copy the resources.
 	 * 
@@ -79,8 +87,7 @@ public class ResourcesMojo extends AbstractMojo {
 		try {
 			Resource rpmResource = new Resource();
 
-			// be opinionated about the resources we want to process
-			rpmResource.setDirectory("src/main/rpm");
+			rpmResource.setDirectory(sources.getAbsolutePath());
 			rpmResource.setFiltering(true);
 
 			List<Resource> resources = new ArrayList<Resource>(

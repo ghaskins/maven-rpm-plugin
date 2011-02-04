@@ -1,7 +1,13 @@
 package com.github.ghaskins;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Collection;
 
 import org.apache.commons.io.FileUtils;
@@ -9,6 +15,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+
 /**
  * 
  * @author ghaskins
@@ -24,7 +31,7 @@ public class CompileMojo extends AbstractMojo {
 	 * @required
 	 */
 	private File outputDirectory;
-	
+
 	/**
 	 * @parameter default-value="${project}"
 	 * @required
@@ -37,15 +44,15 @@ public class CompileMojo extends AbstractMojo {
 		File specFile = findSpecFile();
 		String name = parseSpec("Name");
 		String release = parseSpec("Release");
-		
+
 		StringBuilder command = new StringBuilder("rpmbuild");
 		command.append(" --define \"_topdir ");
 		command.append(outputDirectory);
 		command.append("\" -bs ");
 		command.append(specFile);
-		
+
 		runCommand(command.toString());
-		
+
 		StringBuilder archive = new StringBuilder();
 		archive.append(outputDirectory);
 		archive.append("/SRPMS/");
@@ -55,14 +62,14 @@ public class CompileMojo extends AbstractMojo {
 		archive.append("-");
 		archive.append(release);
 		archive.append(".src.rpm");
-		
+
 		getLog().debug("Assigning " + archive.toString() + " as artifact");
-		
+
 		project.getArtifact().setFile(new File(archive.toString()));
 	}
-	
+
 	private void runCommand(String command) throws MojoExecutionException {
-		getLog().info("Exec: " + command.toString());
+		getLog().debug("Exec: " + command.toString());
 		
 		try	{
 			Process process = Runtime.getRuntime().exec(command.toString());
@@ -70,9 +77,10 @@ public class CompileMojo extends AbstractMojo {
 			process.waitFor();
 			int ret = process.exitValue();
 			
-			if (ret != 0)
-				throw new MojoExecutionException("Exec failed");
-			
+			if (ret != 0) {
+				String errorMsg = stream2String(process.getErrorStream());
+				throw new MojoExecutionException("Exec failed: " + Integer.toString(ret) + ": " + errorMsg);
+			}			
 		} catch(IOException e) {
 			throw new MojoExecutionException(e.getMessage());
 		} catch (InterruptedException e) {
@@ -80,16 +88,44 @@ public class CompileMojo extends AbstractMojo {
 		}
 
 	}
-	
+
+	private String stream2String(InputStream is) throws IOException {
+		/*
+		 * To convert the InputStream to String we use the Reader.read(char[]
+		 * buffer) method. We iterate until the Reader return -1 which means
+		 * there's no more data to read. We use the StringWriter class to
+		 * produce the string.
+		 */
+		if (is != null) {
+			Writer writer = new StringWriter();
+
+			char[] buffer = new char[1024];
+			try {
+				Reader reader = new BufferedReader(new InputStreamReader(is,
+						"UTF-8"));
+				int n;
+				while ((n = reader.read(buffer)) != -1) {
+					writer.write(buffer, 0, n);
+				}
+			} finally {
+				is.close();
+			}
+			return writer.toString();
+		} else {
+			return "";
+		}
+	}
+
 	private String parseSpec(String key) {
 		return "";
 	}
-	
+
 	private File findSpecFile() throws MojoExecutionException {
 
-		String[] exts = new String[]{"spec"};
-		Collection<File> specs = FileUtils.listFiles(outputDirectory, exts, true);
-		
+		String[] exts = new String[] { "spec" };
+		Collection<File> specs = FileUtils.listFiles(outputDirectory, exts,
+				true);
+
 		switch (specs.size()) {
 		case 1:
 			return specs.iterator().next();
