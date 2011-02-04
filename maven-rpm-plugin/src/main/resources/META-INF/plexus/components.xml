@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component-set>
+	<components>
+		<component>
+			<role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+			<role-hint>source-rpm</role-hint>
+			<implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping
+			</implementation>
+			<configuration>
+				<phases>
+					<process-resources>com.github.ghaskins:maven-rpm-plugin:resources</process-resources>
+				</phases>
+			</configuration>
+		</component>
+	</components>
+</component-set>

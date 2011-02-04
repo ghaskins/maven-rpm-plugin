@@ -17,103 +17,84 @@ package com.github.ghaskins;
  */
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.filtering.MavenFilteringException;
 import org.apache.maven.shared.filtering.MavenResourcesExecution;
 import org.apache.maven.shared.filtering.MavenResourcesFiltering;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
- * Goal which touches a timestamp file.
- *
+ * 
  * @goal resources
  * @phase process-resources
- * @requiresDependencyResolution runtime
  */
-public class ResourcesMojo extends AbstractMojo
-{
+public class ResourcesMojo extends AbstractMojo {
     /**
      * The character encoding scheme to be applied when filtering resources.
      *
      * @parameter expression="${encoding}" default-value="${project.build.sourceEncoding}"
      */
     protected String encoding;
+	
+	/**
+	 * The output directory into which to copy the resources.
+	 * 
+	 * @parameter default-value="${project.build.directory}"
+	 * @required
+	 */
+	private File outputDirectory;
 
-    /**
-     * The output directory into which to copy the resources.
-     *
-     * @parameter default-value="${project.build.outputDirectory}"
-     * @required
-     */
-    private File outputDirectory;
+	/**
+	 * @parameter default-value="${project}"
+	 * @required
+	 * @readonly
+	 */
+	protected MavenProject project;
 
-    /**
-     * The list of resources we want to transfer.
-     *
-     * @parameter default-value="${project.resources}"
-     * @required
-     * @readonly
-     */
-    private List resources;
+	/**
+	 * @parameter default-value="${session}"
+	 * @readonly
+	 * @required
+	 */
+	protected MavenSession session;
 
-    /**
-     * @parameter default-value="${project}"
-     * @required
-     * @readonly
-     */
-    protected MavenProject project;
+	/**
+	 * 
+	 * @component 
+	 *            role="org.apache.maven.shared.filtering.MavenResourcesFiltering"
+	 *            role-hint="default"
+	 * @required
+	 */
+	protected MavenResourcesFiltering filtering;
 
-    /**
-     * @parameter default-value="${session}"
-     * @readonly
-     * @required
-     */
-    protected MavenSession session;   
+	public void execute() throws MojoExecutionException {
+		try {
+			Resource rpmResource = new Resource();
 
-    /**
-     * 
-     * @component role="org.apache.maven.shared.filtering.MavenResourcesFiltering" role-hint="default"
-     * @required
-     */    
-    protected MavenResourcesFiltering mavenResourcesFiltering;    
- 
+			// be opinionated about the resources we want to process
+			rpmResource.setDirectory("src/main/rpm");
+			rpmResource.setFiltering(true);
 
-    public void execute()
-        throws MojoExecutionException
-    {
-    	getLog().info("ResourcesMojo, bitch!");
-    	
-        try
-        {
-            
-            if ( StringUtils.isEmpty( encoding ) )
-            {
-                getLog().warn(
-                               "File encoding has not been set, using platform encoding " + ReaderFactory.FILE_ENCODING
-                                   + ", i.e. build is platform dependent!" );
-            }
-            
-            MavenResourcesExecution mavenResourcesExecution = new MavenResourcesExecution( resources, 
-                                                                                           outputDirectory,
-                                                                                           project, encoding,
-                                                                                           Collections.EMPTY_LIST,
-                                                                                           Collections.EMPTY_LIST,
-                                                                                           session );
-            
-            mavenResourcesExecution.setOverwrite( true ); 
-            mavenResourcesFiltering.filterResources( mavenResourcesExecution );
-        }
-        catch ( MavenFilteringException e )
-        {
-            throw new MojoExecutionException( e.getMessage(), e );
-        }
+			List<Resource> resources = new ArrayList<Resource>(
+					Arrays.asList(rpmResource));
 
-    }
+			MavenResourcesExecution exe = new MavenResourcesExecution(
+					resources, outputDirectory, project, encoding,
+					Collections.EMPTY_LIST, Collections.EMPTY_LIST, session);
+
+			exe.setOverwrite(true);
+			filtering.filterResources(exe);
+		} catch (MavenFilteringException e) {
+			throw new MojoExecutionException(e.getMessage(), e);
+		}
+
+	}
 }
