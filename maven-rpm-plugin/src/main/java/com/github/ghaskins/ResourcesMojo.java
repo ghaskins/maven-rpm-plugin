@@ -47,7 +47,7 @@ public class ResourcesMojo extends AbstractMojo {
 	/**
 	 * The output directory into which to copy the resources.
 	 * 
-	 * @parameter default-value="${project.build.directory}"
+	 * @parameter default-value="${project.build.directory}/SOURCES"
 	 * @required
 	 */
 	private File outputDirectory;

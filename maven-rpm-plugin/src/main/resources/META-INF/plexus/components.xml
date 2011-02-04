@@ -9,6 +9,7 @@
 			<configuration>
 				<phases>
 					<process-resources>com.github.ghaskins:maven-rpm-plugin:resources</process-resources>
+					<compile>com.github.ghaskins:maven-rpm-plugin:compile</compile>
 				</phases>
 			</configuration>
 		</component>
