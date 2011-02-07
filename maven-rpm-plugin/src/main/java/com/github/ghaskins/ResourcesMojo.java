@@ -55,7 +55,7 @@ public class ResourcesMojo extends AbstractMojo {
 	/**
 	 * The output directory into which to copy the resources.
 	 * 
-	 * @parameter default-value="${project.build.directory}/SOURCES"
+	 * @parameter default-value="${project.build.directory}"
 	 * @required
 	 */
 	private File outputDirectory;
@@ -86,6 +86,7 @@ public class ResourcesMojo extends AbstractMojo {
 	public void execute() throws MojoExecutionException {
 		try {
 			Resource rpmResource = new Resource();
+			File srcDirectory = new File(outputDirectory, "SOURCES");
 
 			rpmResource.setDirectory(sources.getAbsolutePath());
 			rpmResource.setFiltering(true);
@@ -94,7 +95,7 @@ public class ResourcesMojo extends AbstractMojo {
 					Arrays.asList(rpmResource));
 
 			MavenResourcesExecution exe = new MavenResourcesExecution(
-					resources, outputDirectory, project, encoding,
+					resources, srcDirectory, project, encoding,
 					Collections.EMPTY_LIST, Collections.EMPTY_LIST, session);
 
 			exe.setOverwrite(true);
