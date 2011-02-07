@@ -3,11 +3,8 @@ package com.github.ghaskins;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
-import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
