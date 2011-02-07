@@ -10,7 +10,9 @@
 				<phases>
 					<process-resources>com.github.ghaskins:maven-rpm-plugin:resources</process-resources>
 					<copy-dependencies>com.github.ghaskins:maven-rpm-plugin:copy-dependencies</copy-dependencies>
-					<compile>com.github.ghaskins:maven-rpm-plugin:compile</compile>
+					<package>com.github.ghaskins:maven-rpm-plugin:compile</package>
+					<install>org.apache.maven.plugins:maven-install-plugin:install</install>
+					<deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
 				</phases>
 			</configuration>
 		</component>
