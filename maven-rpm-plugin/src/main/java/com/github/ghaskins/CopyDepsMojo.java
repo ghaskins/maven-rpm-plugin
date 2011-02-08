@@ -1,21 +1,31 @@
 package com.github.ghaskins;
 
-import org.apache.maven.plugin.AbstractMojo;
+import java.io.File;
+
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.dependency.CopyDependenciesMojo;
 
 /**
  * 
  * @author ghaskins
  *
+ * @extendsPlugin maven-dependency-plugin
  * @goal copy-dependencies
- * @phase copy-dependencies
+ * @phase process-sources
  */
-public class CopyDepsMojo extends AbstractMojo {
+public class CopyDepsMojo extends CopyDependenciesMojo {
 
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		// TODO Auto-generated method stub
+	/**
+	 * The output directory into which to copy the resources.
+	 * 
+	 * @parameter default-value="${project.build.directory}/SOURCES"
+	 * @required
+	 */
+	private File resourceDirectory;
 
+	public void execute() throws MojoExecutionException {
+		outputDirectory = resourceDirectory;
+		super.execute();
 	}
 
 }
