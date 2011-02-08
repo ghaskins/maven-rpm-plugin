@@ -13,8 +13,12 @@
     automation around the tasks required to maintain the compilation
     from source/specs into RPM artifacts
   </description>
-  <url>http://github.com/ghaskins/maven-rpm-plugin</url>
+  <url>https://github.com/ghaskins/maven-rpm-plugin/wiki/Maven-RPM-Plugin</url>
   <inceptionYear>2011</inceptionYear>
+
+  <scm>
+    <connection>git://github.com/ghaskins/maven-rpm-plugin.git</connection>
+  </scm>
 
   <licenses>
     <license>
