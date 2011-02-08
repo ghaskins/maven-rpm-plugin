@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Resource;
@@ -86,7 +87,12 @@ public class ResourcesMojo extends AbstractMojo {
 	public void execute() throws MojoExecutionException {
 		try {
 			Resource rpmResource = new Resource();
-			File srcDirectory = new File(outputDirectory, "SOURCES");
+			File srcDirectory = new File(outputDirectory, "SOURCES");			
+			Properties props = project.getProperties();
+			
+			/* normalize the version string into an RPM-safe variant (e.g. no dashes) */
+			String safeversion = project.getVersion().replace("-SNAPSHOT", ".SNAPSHOT");
+			props.put("project.rpmsafe.version", safeversion);
 
 			rpmResource.setDirectory(sources.getAbsolutePath());
 			rpmResource.setFiltering(true);
